@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crpto-Details</title>
+  <meta name="author" content="PANKAJ SAHU">
+  <meta name="keywords" content="HTML, CSS, JavaScript, CryptoView, Cryptocurrency, Conversion Rate, Top Coins, Fetch API, CoinGecko API, Web Page, Navigation, Header, Section, Footer, Logo, Search, Main Image, Trending Coins, Card Container, Name, Price, GitHub Logo, Responsive Design, Top Coins Display">
+  <meta name="description" content="It fetches data from the CoinGecko API to display the current conversion rate for Bitcoin in Indian Rupees (INR) and showcases the trending cryptocurrencies with their logos, names, and prices in a responsive layout. Users can navigate through the page and access cryptocurrency details.">
+  <link rel="stylesheet" href="./cryptoCurrency.css" />
+</head>
+
+<body>
+  <nav>
+    <div class="headerDiv">
+      <img src="./logo.png" alt="" />
+      <a href="./CryptoCurrency.html">
+        <h1>CryptoView</h1>
+      </a>
+    </div>
+    <a href="./search.html">
+      <button>search</button>
+    </a>
+  </nav>
+
+  <section>
+    <div class="mainContainer">
+      <div class="textContainer">
+        <h1>CryptroView</h1>
+        <p>A platform to view information about all cryptocurrencies live.</p>
+      </div>
+      <div class="imgContainer">
+        <img src="./main_image.svg" alt="" />
+      </div>
+    </div>
+  </section>
+
+  <div class="topCoinMainContainer">
+    <h2>Top Coins</h2>
+    <div class="TopCoinsDiv" id="TopCoinsDiv"></div>
+  </div>
+
+  <footer>
+    <p>CryptoView Project</p>
+    <img src="./github_logo.png" alt="" />
+  </footer>
+  <script>
+    const getCurrentConversionRate = async () => {
+      const data = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=inr"
+      );
+      const res = await data.json();
+      loadTopCoins(res);
+    };
+
+    const loadTopCoins = async (data) => {
+      const conversionRate = data.bitcoin.inr;
+      const trendingCoins = await fetch(
+        "https://api.coingecko.com/api/v3/search/trending"
+      );
+      const res = await trendingCoins.json();
+      renderTopCoinsOnScreen(conversionRate, res);
+    };
+
+    const renderTopCoinsOnScreen = (conversionRate, topCoins) => {
+      console.log(conversionRate, topCoins);
+      for (let i = 0; i < topCoins.coins.length; i++) {
+        const coinData = topCoins.coins[i].item;
+        const logo = coinData.thumb;
+        const name = `${coinData.name} (${coinData.symbol})`;
+        const price =
+          Math.round(coinData.price_btc * conversionRate * 10000) / 10000;
+        createCard(logo, name, price);
+      }
+    };
+
+    const createCard = (logo, name, price) => {
+      console.log(logo, name, price);
+      const cardContainer = document.createElement("div");
+      cardContainer.classList.add("topcoinsCardContainer");
+
+      const img = document.createElement("img");
+      img.src = logo;
+      img.classList.add("topCoinsLogoImg");
+
+      const div = document.createElement("div");
+      div.classList.add("nameAndPriceContainerTopCoins");
+
+      const name2 = document.createElement("h2");
+      name2.innerText = name;
+
+      const price2 = document.createElement("p");
+      price2.innerText = price;
+
+      div.appendChild(name2);
+      div.appendChild(price2);
+
+      cardContainer.appendChild(img)
+      cardContainer.appendChild(div)
+      document.getElementById("TopCoinsDiv").appendChild(cardContainer)
+    };
+
+    window.onload = function () {
+      getCurrentConversionRate();
+    };
+
+  </script>
+</body>
+
+</html>
